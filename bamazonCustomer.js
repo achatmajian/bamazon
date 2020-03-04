@@ -12,12 +12,12 @@ var connection = mysql.createConnection({
 
 connection.connect(function(error){
     if (error) throw error;
-    runInventory();
+    inventory();
 })
 
 var productArray = [];
 var totalCost = 0;
-function runInventory() {
+function inventory() {
     var totalCost = 0;
     var query = "SELECT * FROM products";
     connection.query(query, function(error, results){
@@ -25,11 +25,11 @@ function runInventory() {
         for (var i = 0; i < results.length; i++){
             productArray.push(results[i]);
         };
-        generateTable();
+        table();
     });
 }
 
-function generateTable() {
+function table() {
         var t = new table;
         productArray.forEach(function(product){
             t.cell("Product ID", product.item_id)
@@ -40,10 +40,10 @@ function generateTable() {
             t.newRow()
         })
         console.log(t.toString());
-        selectionPrompt();
+        select();
     }
 
-function selectionPrompt(){
+function select(){
     inquirer
     .prompt([
         {
@@ -73,17 +73,17 @@ function selectionPrompt(){
             connection.query(updateStock, function(err, res) {
                 if (err) throw err;
             })
-            continuePrompt();
+            purchase();
         }
         else if (answer.quantity > selection.stock_quantity){
             console.log("Insufficient quantity in stock");
-            generateTable();
+            table();
         }
 
     })
 }
 
-function continuePrompt() {
+function purchase() {
     inquirer.prompt([
         {
         name: "continue",
@@ -94,7 +94,7 @@ function continuePrompt() {
     ])
     .then(function(answer){
         if (answer.continue === true){
-            generateTable();
+            table();
         }
         if (answer.continue === false){
             console.log("Your total is: $" + totalCost);
